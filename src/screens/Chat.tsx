@@ -536,9 +536,13 @@ export function Chat({
       channel.notify(t('workspace-command-empty'))
       return
     }
+    // open-if: 'workspace-flow' stays allowed so an in-flow action can
+    // transition to its next stage; a picker the user opened after leaving
+    // the menu wins over a late command result.
     dispatchOverlay({
-      type: 'open',
+      type: 'open-if',
       overlay: { kind: 'workspace-flow', flow: result, index: 0, busy: false, input: null },
+      when: ['none', 'workspace-flow'],
     })
   }
 
@@ -603,12 +607,14 @@ export function Chat({
         return
       }
       setWorkspaceTargets(targets)
+      // open-if: the listing is async — whatever the user opened meanwhile wins.
       dispatchOverlay({
-        type: 'open',
+        type: 'open-if',
         overlay: {
           kind: 'workspace-picker',
           index: Math.max(0, targets.findIndex(target => target.cwd === channel.cwd)),
         },
+        when: ['none'],
       })
     }).catch((error: unknown) => {
       channel.notify(
@@ -800,9 +806,12 @@ export function Chat({
           setEffortOptions(efforts)
           const current = channel.reasoningEffort ?? defaultEffort
           const index = efforts.findIndex(effort => effort.id === current)
+          // open-if: a picker the user opened during the round trip wins
+          // over this late-arriving slider.
           dispatchOverlay({
-            type: 'open',
+            type: 'open-if',
             overlay: { kind: 'effort', index: index >= 0 ? index : 0 },
+            when: ['none'],
           })
         })
         return true

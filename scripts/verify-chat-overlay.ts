@@ -98,6 +98,17 @@ check(
   reduce({ kind: 'theme', index: 1 }, { type: 'set-index', kind: 'model', index: 3 }),
   { kind: 'theme', index: 1 },
 )
+check(
+  'T4c mouse pick sets an absolute index on panels that stay open (effort, rewind list)',
+  [
+    reduce({ kind: 'effort', index: 0 }, { type: 'set-index', kind: 'effort', index: 2 }),
+    reduce(
+      { kind: 'rewind', index: 0, confirm: null, modes: null, modeIndex: 0, busy: false },
+      { type: 'set-index', kind: 'rewind', index: 2 },
+    ).index,
+  ],
+  [{ kind: 'effort', index: 2 }, 2],
+)
 
 // --- T5: history draft edits ---------------------------------------------
 check(
